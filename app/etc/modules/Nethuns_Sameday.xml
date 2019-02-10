@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nethuns_Sameday>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Nethuns_Sameday>
+    </modules>
+</config> 
