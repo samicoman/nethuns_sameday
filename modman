@@ -1,0 +1,6 @@
+app/code/community/Nethuns/Sameday                              app/code/community/Nethuns/Sameday
+app/design/frontend/base/default/layout/nethuns_sameday.xml     app/design/frontend/base/default/layout/nethuns_sameday.xml
+app/design/frontend/base/default/template/nethuns_sameday       app/design/frontend/base/default/template/nethuns_sameday
+app/etc/modules/Nethuns_Sameday.xml                             app/etc/modules/Nethuns_Sameday.xml
+app/locale/ro_RO/Nethuns_Sameday.csv                            app/locale/ro_RO/Nethuns_Sameday.csv
+skin/frontend/base/default/nethuns_sameday                      skin/frontend/base/default/nethuns_sameday
