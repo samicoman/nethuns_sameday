@@ -79,7 +79,7 @@ class Nethuns_Sameday_Model_Api
         Mage::getConfig()->saveConfig('carriers/nethuns_sameday/token', $this->_token, 'default', 0);
     }
 
-    public function request($path, $type, $headers = [], $params = [])
+    public function request($path, $type, $headers = [], $params = [], $decode = true)
     {
         $url = rtrim($this->_apiUrl, '/') . '/api/' . $path . '?_format=json';
 
@@ -116,7 +116,7 @@ class Nethuns_Sameday_Model_Api
 
         curl_close($ch);
 
-        return json_decode($result, true);
+        return $decode ? json_decode($result, true) : $result;
 
     }
 }

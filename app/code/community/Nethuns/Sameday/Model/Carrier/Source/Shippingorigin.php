@@ -1,6 +1,6 @@
 <?php
 
-class Nethuns_Sameday_Model_Carrier_Source_ShippingOrigin
+class Nethuns_Sameday_Model_Carrier_Source_Shippingorigin
 {
     public function toOptionArray()
     {

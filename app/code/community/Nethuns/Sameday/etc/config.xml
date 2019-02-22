@@ -5,6 +5,7 @@
             <version>0.1.0</version>
         </Nethuns_Sameday>
     </modules>
+
     <frontend>
         <routers>
             <nethuns_sameday>
@@ -22,7 +23,18 @@
                 </nethuns_sameday>
             </updates>
         </layout>
+        <events>
+            <sales_order_save_after>
+                <observers>
+                    <nethuns_sameday_sales_order_save_after>
+                        <class>nethuns_sameday/observer</class>
+                        <method>sales_order_save_after</method>
+                    </nethuns_sameday_sales_order_save_after>
+                </observers>
+            </sales_order_save_after>
+        </events>
     </frontend>
+
     <global>
         <models>
             <nethuns_sameday>
@@ -69,11 +81,47 @@
             </nethuns_sameday>
         </helpers>
     </global>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <nethuns_sameday>
+                    <files>
+                        <default>Nethuns_Sameday.csv</default>
+                    </files>
+                </nethuns_sameday>
+            </modules>
+        </translate>
+        <events>
+            <controller_action_layout_render_before_adminhtml_sales_order_shipment_view>
+                <observers>
+                    <nethuns_sameday_controller_action_layout_render_before_adminhtml_sales_order_shipment_view>
+                        <type>singleton</type>
+                        <class>nethuns_sameday/observer</class>
+                        <method>controller_action_layout_render_before_adminhtml_sales_order_shipment_view</method>
+                    </nethuns_sameday_controller_action_layout_render_before_adminhtml_sales_order_shipment_view>
+                </observers>
+            </controller_action_layout_render_before_adminhtml_sales_order_shipment_view>
+        </events>
+    </adminhtml>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Nethuns_Sameday after="Mage_Adminhtml">Nethuns_Sameday_Adminhtml</Nethuns_Sameday>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
     <default>
          <carriers>
              <nethuns_sameday>
                  <model>nethuns_sameday/carrier_sameday</model>
              </nethuns_sameday>
 	     </carriers>
-       </default>
+    </default>
 </config>

@@ -1,6 +1,6 @@
 <?php
 
-class Nethuns_Sameday_Model_Carrier_Source_PackageType
+class Nethuns_Sameday_Model_Carrier_Source_Packagetype
 {
     public function toOptionArray()
     {
@@ -16,7 +16,7 @@ class Nethuns_Sameday_Model_Carrier_Source_PackageType
             [
                 'value' => Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_LARGE,
                 'label' => Mage::helper('nethuns_sameday')->__('Large package')
-            ],
+            ]
         ];
     }
 }

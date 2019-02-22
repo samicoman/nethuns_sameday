@@ -139,8 +139,7 @@ class Nethuns_Sameday_Model_Carrier_Sameday
         /* TODO: figure out a way to calculate the package number based on product attributes or max package weight (see USPS) */
         $this->_rawRequest->setPackageNumber($request->getPackageNumber() ? $request->getPackageNumber() : self::DEFAULT_PACKAGE_NUMBER);
         $this->_rawRequest->setPackageWeight($request->getPackageWeight());
-        /* TODO: move this to admin setting */
-        $this->_rawRequest->setAwbPayment($request->getAwbPayment() ? $request->getAwbPayment() : self::CLIENT);
+        $this->_rawRequest->setAwbPayment($request->getAwbPayment() ? $request->getAwbPayment() : Mage::getStoreConfig('carriers/nethuns_sameday/awb_payment', $this->getStore()));
         $this->_rawRequest->setCashOnDelivery($request->getBaseSubtotalInclTax() ? $request->getBaseSubtotalInclTax() : 0);
         $this->_rawRequest->setInsuredValue($request->getPackageValue() ? $request->getPackageValue() : 0);
         $this->_rawRequest->setThirdPartyPickup(self::TPP_NO);
@@ -168,8 +167,8 @@ class Nethuns_Sameday_Model_Carrier_Sameday
             $this->_rawRequest->exportData()
         );
 
+        /* TODO: add setting to chose whether to see the error on the checkout or not */
         if (isset($response['code']) && $response['code'] != 200) {
-            /* TODO: add setting to chose wether to see the error */
             /** @var Mage_Shipping_Model_Rate_Result_Error $error */
             $error = Mage::getModel('shipping/rate_result_error');
             $error->setCarrier($this->_code);

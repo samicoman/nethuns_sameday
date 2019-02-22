@@ -22,6 +22,8 @@
  * @method Nethuns_Sameday_Model_Rate_Request setThirdPartyPickup(int $value)
  * @method int getDeliveryInterval()
  * @method Nethuns_Sameday_Model_Rate_Request setDeliveryInterval(int $value)
+ * @method string getClientObservation()
+ * @method Nethuns_Sameday_Model_Rate_Request setClientObservation(string $value)
  * @method array getAwbRecipient()
  * @method array getParcels()
  * @method array getServiceTaxes()
@@ -29,6 +31,8 @@
  */
 class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
 {
+    protected $_packageType;
+
     /**
      * @param Mage_Shipping_Model_Rate_Request $request
      */
@@ -64,10 +68,10 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
         $data = [];
 
         $parcel = [
-            'height'    => $request->getHeight(),
-            'length'    => $request->getLength(),
-            'width'     => $request->getWidth(),
-            'weight'    => $request->getPackageWeight()
+            'height'    => $request->getHeight() ? $request->getHeight() : $this->getDefaultHeight(),
+            'length'    => $request->getLength() ? $request->getLength() : $this->getDefaultLength(),
+            'width'     => $request->getWidth() ? $request->getWidth() : $this->getDefaultWidth(),
+            'weight'    => $request->getPackageWeight() ? $request->getPackageWeight() : $this->getDefaultWeight()
         ];
         $data[] = $parcel;
 
@@ -75,9 +79,9 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
     }
 
     /**
-     * @param Mage_Shipping_Model_Rate_Request $request
+     *
      */
-    public function setServiceTaxes($request)
+    public function setServiceTaxes()
     {
         $data = [];
 
@@ -137,5 +141,129 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
             $response[lcfirst(str_replace('_', '', ucwords($key, '_')))] = $value;
         }
         return $response;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConfigPackageType()
+    {
+        return $this->_packageType ? $this->_packageType : Mage::getStoreConfig('carriers/nethuns_sameday/package_type');
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultHeight()
+    {
+        $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_height');
+
+        if($default) {
+            return $default;
+        }
+
+        switch ($this->getConfigPackageType()) {
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_ENVELOPE:
+                $default = 1;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_REGULAR:
+                $default = 25;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_LARGE:
+                $default = 100;
+                break;
+            default:
+                $default = 50;
+                break;
+        }
+
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultLength()
+    {
+        $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_length');
+
+        if($default) {
+            return $default;
+        }
+
+        switch ($this->getConfigPackageType()) {
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_ENVELOPE:
+                $default = 30;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_REGULAR:
+                $default = 25;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_LARGE:
+                $default = 100;
+                break;
+            default:
+                $default = 50;
+                break;
+        }
+
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultWidth()
+    {
+        $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_width');
+
+        if($default) {
+            return $default;
+        }
+
+        switch ($this->getConfigPackageType()) {
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_ENVELOPE:
+                $default = 20;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_REGULAR:
+                $default = 25;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_LARGE:
+                $default = 100;
+                break;
+            default:
+                $default = 50;
+                break;
+        }
+
+        return $default;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function getDefaultWeight()
+    {
+        $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_weight');
+
+        if($default) {
+            return $default;
+        }
+
+        switch ($this->getConfigPackageType()) {
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_ENVELOPE:
+                $default = 0.5;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_REGULAR:
+                $default = 3;
+                break;
+            case Nethuns_Sameday_Model_Carrier_Sameday::PACKAGE_TYPE_LARGE:
+                $default = 50;
+                break;
+            default:
+                $default = 5;
+                break;
+        }
+
+        return $default;
     }
 }
