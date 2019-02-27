@@ -71,6 +71,22 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
 						</api_url>
+						<http_user translate="label">
+							<label>HTTP Auth Username</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>21</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</http_user>
+						<http_pass translate="label">
+							<label>HTTP Auth Password</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>22</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</http_pass>
 						<shipping_origin translate="label">
 							<label>Shipping origin</label>
 							<comment>The address the package will be picked up from (usually the warehouse).</comment>

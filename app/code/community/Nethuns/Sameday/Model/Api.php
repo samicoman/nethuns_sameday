@@ -40,6 +40,8 @@ class Nethuns_Sameday_Model_Api
         $this->_apiUrl = Mage::getStoreConfig('carriers/nethuns_sameday/api_url');
         $this->_username = Mage::getStoreConfig('carriers/nethuns_sameday/username');
         $this->_password = Mage::getStoreConfig('carriers/nethuns_sameday/password');
+        $this->_httpUser = Mage::getStoreConfig('carriers/nethuns_sameday/http_user');
+        $this->_httpPass = Mage::getStoreConfig('carriers/nethuns_sameday/http_pass');
 
         /* A dummy check to see if the token is valid */
         if($this->_token) {
@@ -54,7 +56,7 @@ class Nethuns_Sameday_Model_Api
             self::POST,
             [
                 'X-Auth-Username' => $this->_username,
-                'X-Auth-Password' => $this->_password
+                'X-Auth-Password' => $this->_password,
             ],
             [
                 'remember_me' => 'true'
@@ -104,8 +106,12 @@ class Nethuns_Sameday_Model_Api
         $headers[] = 'Content-type: application/x-www-form-urlencoded';
         $headers[] = 'X-AUTH-TOKEN: ' . $this->_token;
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        if($this->_httpUser && $this->_httpPass) {
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_USERPWD, $this->_httpUser . ':' . $this->_httpPass);
+        }
 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         /* TODO: test & improve error handling */
         if (!$result = curl_exec($ch)) {
