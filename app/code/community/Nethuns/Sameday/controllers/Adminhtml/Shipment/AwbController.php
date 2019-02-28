@@ -34,4 +34,9 @@ class Nethuns_Sameday_Adminhtml_Shipment_AwbController extends Mage_Adminhtml_Co
             'application/pdf'
         );
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('sales/shipment');
+    }
 }
