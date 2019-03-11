@@ -1,6 +1,6 @@
 # Sameday Courier Romania - Magento 1.x Module
 
-## Current Features - v. 0.1.2
+## Current Features - v. 0.1.4
 - get price quote from the API (checkout)
 - choose between Sameday and Nextday delivery - if applicable (checkout)
 - change the shipping origin (admin)
@@ -13,18 +13,18 @@
 
 ## Future Features
 
-### v. 0.1.3
+### v. 0.2.0
 - cancel AWB for order in admin (/api/awb/ ..)
 - improve error handling
 - add sandbox configuration
 - change insured value (admin)
 
-### v. 0.2.0
+### v. 0.3.0
 - status AWB in admin
 - optional service taxes on checkout (deschidere colet, reambalare, colet la schimb, retur documente)
 - handle multiple parcels
 
-### v. 0.3.0
+### v. 0.4.0
 - delivery hour interval on checkout
 - third party pickup config & api
 - estimate delivery timeframe on checkout
