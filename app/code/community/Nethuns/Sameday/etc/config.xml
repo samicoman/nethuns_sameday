@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Nethuns_Sameday>
-            <version>0.1.2</version>
+            <version>0.1.4</version>
         </Nethuns_Sameday>
     </modules>
 
@@ -118,10 +118,10 @@
     </admin>
 
     <default>
-         <carriers>
-             <nethuns_sameday>
-                 <model>nethuns_sameday/carrier_sameday</model>
-             </nethuns_sameday>
-	     </carriers>
+        <carriers>
+            <nethuns_sameday>
+                <model>nethuns_sameday/carrier_sameday</model>
+            </nethuns_sameday>
+        </carriers>
     </default>
 </config>

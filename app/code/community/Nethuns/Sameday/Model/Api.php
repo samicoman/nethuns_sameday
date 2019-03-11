@@ -26,11 +26,6 @@ class Nethuns_Sameday_Model_Api
      */
     protected $_password;
 
-    const GET = 'get';
-    const POST = 'post';
-    const PUT = 'put';
-    const DELETE = 'delete';
-
     /**
      * Initialize API class
      */
@@ -44,28 +39,29 @@ class Nethuns_Sameday_Model_Api
         $this->_httpPass = Mage::getStoreConfig('carriers/nethuns_sameday/http_pass');
 
         /* A dummy check to see if the token is valid */
-        if($this->_token) {
-            $response = $this->request('geolocation/county', self::GET, [], ['name' => 'ilfov']);
-            if(!empty($response['total'])) {
+        if ($this->_token) {
+            $response = $this->request('geolocation/county', Zend_Http_Client::GET, array(), array('name' => 'ilfov'));
+            if (!empty($response['total'])) {
                 return;
             }
         }
 
         $response = $this->request(
             'authenticate',
-            self::POST,
-            [
+            Zend_Http_Client::POST,
+            array(
                 'X-Auth-Username' => $this->_username,
-                'X-Auth-Password' => $this->_password,
-            ],
-            [
+                'X-Auth-Password' => $this->_password
+            ),
+            array(
                 'remember_me' => 'true'
-            ]
+            )
         );
 
-        if(empty($response['token'])) {
-            if(Mage::getDesign()->getArea() == 'adminhtml') {
-                $error = Mage::helper('nethuns_sameday')->__("There's something wrong with the API connection. Please check the settings!");
+        if (empty($response['token'])) {
+            if (Mage::getDesign()->getArea() == 'adminhtml') {
+                $error = Mage::helper('nethuns_sameday')->__("There's something wrong with the API connection.
+                 Please check the settings!");
                 /** @var Mage_Adminhtml_Model_Session $session */
                 $session = Mage::getSingleton('adminhtml/session');
                 $session->addError($error);
@@ -81,48 +77,80 @@ class Nethuns_Sameday_Model_Api
         Mage::getConfig()->saveConfig('carriers/nethuns_sameday/token', $this->_token, 'default', 0);
     }
 
-    public function request($path, $type, $headers = [], $params = [], $decode = true)
+    public function request($path, $type, $headers = array(), $params = array(), $decode = true)
     {
         $url = rtrim($this->_apiUrl, '/') . '/api/' . $path . '?_format=json';
 
+        /* Funky hack because the API does not handle Bucuresti */
+        if($path == 'geolocation/city') {
+            $params = $this->prepareCityExceptions($params);
+        }
+
         switch ($type) {
-            case self::POST:
+            case Zend_Http_Client::POST:
                 $ch = curl_init($url);
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
                 break;
-            case self::GET:
-                $url .= '&' . http_build_query($params);
+            case Zend_Http_Client::GET:
+                $url .= !empty($params) ? '&' . http_build_query($params) : '';
                 $ch = curl_init($url);
                 break;
         }
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         foreach ($headers as $key => $value) {
             $headers[] = $key . ': ' . $value;
         }
 
         $headers[] = 'Content-type: application/x-www-form-urlencoded';
-        $headers[] = 'X-AUTH-TOKEN: ' . $this->_token;
+        $headers[] = 'X-AUTH-TOKEN: ' . ($this->_token ? $this->_token : '2c19bb06b63523b0bab931e81d04a41aba9b1c9e');
 
-        if($this->_httpUser && $this->_httpPass) {
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        if ($this->_httpUser && $this->_httpPass) {
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($ch, CURLOPT_USERPWD, $this->_httpUser . ':' . $this->_httpPass);
         }
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         /* TODO: test & improve error handling */
         if (!$result = curl_exec($ch)) {
             /** @var Mage_Adminhtml_Model_Session $session */
             $session = Mage::getSingleton('adminhtml/session');
-            $session->addError((curl_error($ch)));
+            $session->addError(curl_error($ch));
         }
 
         curl_close($ch);
 
         return $decode ? json_decode($result, true) : $result;
 
+    }
+
+    function prepareCityExceptions($params)
+    {
+        if (!strtolower(iconv('UTF-8','ASCII//TRANSLIT', $params['name'])) == 'bucuresti')
+        {
+            return $params;
+        }
+
+        $address = $params['address'];
+
+        if(empty($address)) {
+            return $params;
+        }
+
+        $address = strtolower($address);
+        $pattern = '/sector(ul)*(\s)(\d){1}/mi';
+        $matches = array();
+
+        preg_match($pattern, $address, $matches);
+
+        /* We don't need this anymore */
+        unset($params['address']);
+        $params['name'] = !empty($matches[0]) ? 'Sectorul ' . end($matches) : $params['name'];
+
+        return $params;
     }
 }

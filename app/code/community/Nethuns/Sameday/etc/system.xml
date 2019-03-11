@@ -1,209 +1,211 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<sections>
-		<carriers>
-			<groups>
-				<nethuns_sameday translate="label" module="nethuns_sameday">
-					<label>Sameday</label>
-					<frontend_type>text</frontend_type>
-					<sort_order>12</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>1</show_in_website>
-					<show_in_store>1</show_in_store>
-					<fields>
-						<active translate="label">
-							<label>Enable</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>1</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</active>
-						<automate>
-							<label>Automate</label>
-							<comment>Automatically create the AWB without the need to process the order</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>2</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</automate>
-						<showmethod translate="label">
-							<label>Show method</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>3</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</showmethod>
-						<title translate="label">
-							<label>Title</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>5</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</title>
-						<username translate="label">
-							<label>Username</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</username>
-						<password translate="label">
-							<label>Password</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>15</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</password>
-						<api_url translate="label">
-							<label>API URL</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>20</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</api_url>
-						<http_user translate="label">
-							<label>HTTP Auth Username</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>21</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</http_user>
-						<http_pass translate="label">
-							<label>HTTP Auth Password</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>22</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</http_pass>
-						<shipping_origin translate="label">
-							<label>Shipping origin</label>
-							<comment>The address the package will be picked up from (usually the warehouse).</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>nethuns_sameday/carrier_source_shippingorigin</source_model>
-							<sort_order>25</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</shipping_origin>
-						<package_type translate="label">
-							<label>Package type</label>
-							<comment>The most often package size used.</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>nethuns_sameday/carrier_source_packagetype</source_model>
-							<sort_order>30</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</package_type>
-						<awb_payment translate="label">
-							<label>AWB Payment</label>
-							<comment>Who pays for the shipping. If the shipping costs were already paid by the customer, choose Sender.</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>nethuns_sameday/carrier_source_awbpayment</source_model>
-							<sort_order>35</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</awb_payment>
-						<return_papers translate="label">
-							<label>Add Return Papers Service Tax</label>
-							<comment>Add this tax by default when getting the delivery quote.</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>40</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</return_papers>
-						<repack translate="label">
-							<label>Add Repack Service Tax</label>
-							<comment>Add this tax by default when getting the delivery quote.</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>41</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</repack>
-						<exchange_package translate="label">
-							<label>Add Package Exchange Service Tax</label>
-							<comment>Add this tax by default when getting the delivery quote.</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>42</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</exchange_package>
-						<open_package translate="label">
-							<label>Add Open Package Service Tax</label>
-							<comment>Add this tax by default when getting the delivery quote.</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>43</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</open_package>
-						<default_height translate="label">
-							<label>Default Package Height</label>
-							<comment>Most common value met. Used if not already set on product.</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>50</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</default_height>
-						<default_length translate="label">
-							<label>Default Package Length</label>
-							<comment>Most common value met. Used if not already set on product.</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>51</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</default_length>
-						<defaul_width translate="label">
-							<label>Default Package Width</label>
-							<comment>Most common value met. Used if not already set on product.</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>52</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</defaul_width>
-						<default_weight translate="label">
-							<label>Default Package Weight</label>
-							<comment>Most common value met. Used if not already set on product.</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>53</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</default_weight>
-						<sort_order translate="label">
-							<label>Sort order</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>100</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</sort_order>
-					</fields>
-				</nethuns_sameday>
-			</groups>
-		</carriers>
-	</sections>
+    <sections>
+        <carriers>
+            <groups>
+                <nethuns_sameday translate="label" module="nethuns_sameday">
+                    <label>Sameday</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>12</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enable</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active>
+                        <automate>
+                            <label>Automate</label>
+                            <comment>Automatically create the AWB without the need to process the order</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </automate>
+                        <showmethod translate="label">
+                            <label>Show method</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </showmethod>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </username>
+                        <password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </password>
+                        <api_url translate="label">
+                            <label>API URL</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </api_url>
+                        <http_user translate="label">
+                            <label>HTTP Auth Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </http_user>
+                        <http_pass translate="label">
+                            <label>HTTP Auth Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </http_pass>
+                        <shipping_origin translate="label">
+                            <label>Shipping origin</label>
+                            <comment>The address the package will be picked up from (usually the warehouse).</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>nethuns_sameday/carrier_source_shippingorigin</source_model>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </shipping_origin>
+                        <package_type translate="label">
+                            <label>Package type</label>
+                            <comment>The most often package size used.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>nethuns_sameday/carrier_source_packagetype</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </package_type>
+                        <awb_payment translate="label">
+                            <label>AWB Payment</label>
+                            <comment>Who pays for the shipping. If the shipping costs were already paid by the customer,
+                                choose Sender.
+                            </comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>nethuns_sameday/carrier_source_awbpayment</source_model>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </awb_payment>
+                        <return_papers translate="label">
+                            <label>Add Return Papers Service Tax</label>
+                            <comment>Add this tax by default when getting the delivery quote.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </return_papers>
+                        <repack translate="label">
+                            <label>Add Repack Service Tax</label>
+                            <comment>Add this tax by default when getting the delivery quote.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </repack>
+                        <exchange_package translate="label">
+                            <label>Add Package Exchange Service Tax</label>
+                            <comment>Add this tax by default when getting the delivery quote.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>42</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </exchange_package>
+                        <open_package translate="label">
+                            <label>Add Open Package Service Tax</label>
+                            <comment>Add this tax by default when getting the delivery quote.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>43</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </open_package>
+                        <default_height translate="label">
+                            <label>Default Package Height</label>
+                            <comment>Most common value met. Used if not already set on product.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </default_height>
+                        <default_length translate="label">
+                            <label>Default Package Length</label>
+                            <comment>Most common value met. Used if not already set on product.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </default_length>
+                        <defaul_width translate="label">
+                            <label>Default Package Width</label>
+                            <comment>Most common value met. Used if not already set on product.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>52</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </defaul_width>
+                        <default_weight translate="label">
+                            <label>Default Package Weight</label>
+                            <comment>Most common value met. Used if not already set on product.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </default_weight>
+                        <sort_order translate="label">
+                            <label>Sort order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sort_order>
+                    </fields>
+                </nethuns_sameday>
+            </groups>
+        </carriers>
+    </sections>
 </config>

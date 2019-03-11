@@ -2,24 +2,50 @@
 
 class Nethuns_Sameday_Model_Awb_Request extends Nethuns_Sameday_Model_Rate_Request
 {
+    protected $_returnPapers;
+    protected $_repack;
+    protected $_exchangePackage;
+    protected $_openPackage;
+
+    /**
+     * Nethuns_Sameday_Model_Awb_Request constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->_returnPapers = Mage::getStoreConfigFlag('carriers/nethuns_sameday/return_papers');
+        $this->_repack = Mage::getStoreConfigFlag('carriers/nethuns_sameday/repack');
+        $this->_exchangePackage = Mage::getStoreConfigFlag('carriers/nethuns_sameday/exchange_package');
+        $this->_openPackage = Mage::getStoreConfigFlag('carriers/nethuns_sameday/open_package');
+    }
+
     /**
      * @param Mage_Sales_Model_Order_Address $address
      */
     public function setAwbRecipient($address)
     {
-        $data = [];
+        $data = array();
 
         /** @var Nethuns_Sameday_Model_Api $api */
         $api = Mage::getSingleton('nethuns_sameday/api');
 
         /** @var Mage_Directory_Model_Region $region */
         $region = Mage::getModel('directory/region')->load($address->getRegionId());
-        $response = $api->request('geolocation/county', Nethuns_Sameday_Model_Api::GET, [], ['name' => $region->getName()]);
+        $response = $api->request(
+            'geolocation/county',
+            Zend_Http_Client::GET,
+            array(),
+            array('name' => $region->getName()));
         $data['county'] = $response['data'][0]['id'];
         $data['countyString'] = $response['data'][0]['name'];
 
         $city = $address->getCity();
-        $response = $api->request('geolocation/city', Nethuns_Sameday_Model_Api::GET, [], ['name' => $city, 'county' => $response['data'][0]['id']]);
+        $response = $api->request(
+            'geolocation/city',
+            Zend_Http_Client::GET,
+            array(),
+            array('name' => $city, 'county' => $response['data'][0]['id']));
         $data['city'] = $response['data'][0]['id'];
         $data['cityString'] = $response['data'][0]['name'];
 
@@ -37,14 +63,14 @@ class Nethuns_Sameday_Model_Awb_Request extends Nethuns_Sameday_Model_Rate_Reque
      */
     public function setParcels($address)
     {
-        $data = [];
+        $data = array();
 
-        $parcel = [
-            'height'    => $address->getHeight() ? $address->getHeight() : $this->getDefaultHeight(),
-            'length'    => $address->getLength() ? $address->getLength() : $this->getDefaultLength(),
-            'width'     => $address->getWidth() ? $address->getWidth() : $this->getDefaultWidth(),
-            'weight'    => $address->getWeight() ? $address->getWeight() : $this->getDefaultWeight()
-        ];
+        $parcel = array(
+            'height' => $address->getHeight() ? $address->getHeight() : $this->getDefaultHeight(),
+            'length' => $address->getLength() ? $address->getLength() : $this->getDefaultLength(),
+            'width' => $address->getWidth() ? $address->getWidth() : $this->getDefaultWidth(),
+            'weight' => $address->getWeight() ? $address->getWeight() : $this->getDefaultWeight()
+        );
         $data[] = $parcel;
 
         $this->setData('parcels', $data);
@@ -55,46 +81,43 @@ class Nethuns_Sameday_Model_Awb_Request extends Nethuns_Sameday_Model_Rate_Reque
      */
     public function setServiceTaxes()
     {
-        $data = [];
+        $data = array();
 
         /** @var Nethuns_Sameday_Model_Api $api */
         $api = Mage::getSingleton('nethuns_sameday/api');
-
-        $return_papers = Mage::getStoreConfigFlag('carriers/nethuns_sameday/return_papers');
-        $repack = Mage::getStoreConfigFlag('carriers/nethuns_sameday/repack');
-        $exchange_package = Mage::getStoreConfigFlag('carriers/nethuns_sameday/exchange_package');
-        $open_package = Mage::getStoreConfigFlag('carriers/nethuns_sameday/open_package');
-
-        $response = $api->request('client/services', Nethuns_Sameday_Model_Api::GET, [], []);
+        $response = $api->request('client/services', Zend_Http_Client::GET, array(), array());
 
         foreach ($response['data'] as $service) {
-            if($service['id'] == $this->getService()) {
-                foreach ($service['serviceOptionalTaxes'] as $tax) {
-                    if($tax['packageType'] != $this->getPackageType()) {
-                        continue;
-                    }
-                    switch ($tax['name']) {
-                        case 'Deschidere Colet':
-                            if($open_package) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                        case 'Reambalare':
-                            if($repack) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                        case 'Colet la schimb':
-                            if($exchange_package) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                        case 'Retur Documente':
-                            if($return_papers) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                    }
+            if ($service['id'] != $this->getService()) {
+                continue;
+            }
+
+            foreach ($service['serviceOptionalTaxes'] as $tax) {
+                if ($tax['packageType'] != $this->getPackageType()) {
+                    continue;
+                }
+
+                switch ($tax['name']) {
+                    case 'Deschidere Colet':
+                        if ($this->_openPackage) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
+                    case 'Reambalare':
+                        if ($this->_repack) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
+                    case 'Colet la schimb':
+                        if ($this->_exchangePackage) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
+                    case 'Retur Documente':
+                        if ($this->_returnPapers) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
                 }
             }
         }

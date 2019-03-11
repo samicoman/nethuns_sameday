@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @method int getPickupPoint()
  * @method Nethuns_Sameday_Model_Rate_Request setPickupPoint(int $value)
@@ -33,23 +34,51 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
 {
     protected $_packageType;
 
+    protected $_returnPapers;
+    protected $_repack;
+    protected $_exchangePackage;
+    protected $_openPackage;
+
+    /**
+     * Nethuns_Sameday_Model_Awb_Request constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->_returnPapers = Mage::getStoreConfigFlag('carriers/nethuns_sameday/return_papers');
+        $this->_repack = Mage::getStoreConfigFlag('carriers/nethuns_sameday/repack');
+        $this->_exchangePackage = Mage::getStoreConfigFlag('carriers/nethuns_sameday/exchange_package');
+        $this->_openPackage = Mage::getStoreConfigFlag('carriers/nethuns_sameday/open_package');
+    }
+
     /**
      * @param Mage_Shipping_Model_Rate_Request $request
      */
     public function setAwbRecipient($request)
     {
-        $data = [];
+        $data = array();
 
         /** @var Nethuns_Sameday_Model_Api $api */
         $api = Mage::getSingleton('nethuns_sameday/api');
 
         /** @var Mage_Directory_Model_Region $region */
         $region = Mage::getModel('directory/region')->load($request->getDestRegionId());
-        $response = $api->request('geolocation/county', Nethuns_Sameday_Model_Api::GET, [], ['name' => $region->getName()]);
+        $response = $api->request(
+            'geolocation/county',
+            Zend_Http_Client::GET,
+            array(),
+            array('name' => $region->getName())
+        );
         $data['county'] = $response['data'][0]['id'];
 
         $city = $request->getDestCity();
-        $response = $api->request('geolocation/city', Nethuns_Sameday_Model_Api::GET, [], ['name' => $city, 'county' => $response['data'][0]['id']]);
+        $response = $api->request(
+            'geolocation/city',
+            Zend_Http_Client::GET,
+            array(),
+            array('name' => $city, 'county' => $response['data'][0]['id'], 'address' => $request->getDestStreet())
+        );
         $data['city'] = $response['data'][0]['id'];
 
         $data['address'] = $request->getDestStreet() . ' ' . $request->getDestStreetLine2();
@@ -65,14 +94,14 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
      */
     public function setParcels($request)
     {
-        $data = [];
+        $data = array();
 
-        $parcel = [
-            'height'    => $request->getHeight() ? $request->getHeight() : $this->getDefaultHeight(),
-            'length'    => $request->getLength() ? $request->getLength() : $this->getDefaultLength(),
-            'width'     => $request->getWidth() ? $request->getWidth() : $this->getDefaultWidth(),
-            'weight'    => $request->getPackageWeight() ? $request->getPackageWeight() : $this->getDefaultWeight()
-        ];
+        $parcel = array(
+            'height' => $request->getHeight() ? $request->getHeight() : $this->getDefaultHeight(),
+            'length' => $request->getLength() ? $request->getLength() : $this->getDefaultLength(),
+            'width' => $request->getWidth() ? $request->getWidth() : $this->getDefaultWidth(),
+            'weight' => $request->getPackageWeight() ? $request->getPackageWeight() : $this->getDefaultWeight()
+        );
         $data[] = $parcel;
 
         $this->setData('parcels', $data);
@@ -83,46 +112,44 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
      */
     public function setServiceTaxes()
     {
-        $data = [];
+        $data = array();
 
         /** @var Nethuns_Sameday_Model_Api $api */
         $api = Mage::getSingleton('nethuns_sameday/api');
 
-        $return_papers = Mage::getStoreConfigFlag('carriers/nethuns_sameday/return_papers');
-        $repack = Mage::getStoreConfigFlag('carriers/nethuns_sameday/repack');
-        $exchange_package = Mage::getStoreConfigFlag('carriers/nethuns_sameday/exchange_package');
-        $open_package = Mage::getStoreConfigFlag('carriers/nethuns_sameday/open_package');
-
-        $response = $api->request('client/services', Nethuns_Sameday_Model_Api::GET, [], []);
+        $response = $api->request('client/services', Zend_Http_Client::GET, array(), array());
 
         foreach ($response['data'] as $service) {
-            if($service['id'] == $this->getService()) {
-                foreach ($service['serviceOptionalTaxes'] as $tax) {
-                    if($tax['packageType'] != $this->getPackageType()) {
-                        continue;
-                    }
-                    switch ($tax['name']) {
-                        case 'Deschidere Colet':
-                            if($open_package) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                        case 'Reambalare':
-                            if($repack) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                        case 'Colet la schimb':
-                            if($exchange_package) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                        case 'Retur Documente':
-                            if($return_papers) {
-                                $data[] = $tax['id'];
-                            }
-                            break;
-                    }
+            if ($service['id'] != $this->getService()) {
+                continue;
+            }
+
+            foreach ($service['serviceOptionalTaxes'] as $tax) {
+                if ($tax['packageType'] != $this->getPackageType()) {
+                    continue;
+                }
+
+                switch ($tax['name']) {
+                    case 'Deschidere Colet':
+                        if ($this->_openPackage) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
+                    case 'Reambalare':
+                        if ($this->_repack) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
+                    case 'Colet la schimb':
+                        if ($this->_exchangePackage) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
+                    case 'Retur Documente':
+                        if ($this->_returnPapers) {
+                            $data[] = $tax['id'];
+                        }
+                        break;
                 }
             }
         }
@@ -136,10 +163,11 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
     public function exportData()
     {
         $data = $this->getData();
-        $response = [];
-        foreach($data as $key => $value) {
+        $response = array();
+        foreach ($data as $key => $value) {
             $response[lcfirst(str_replace('_', '', ucwords($key, '_')))] = $value;
         }
+
         return $response;
     }
 
@@ -148,7 +176,9 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
      */
     public function getConfigPackageType()
     {
-        return $this->_packageType ? $this->_packageType : Mage::getStoreConfig('carriers/nethuns_sameday/package_type');
+        return $this->_packageType
+            ? $this->_packageType
+            : Mage::getStoreConfig('carriers/nethuns_sameday/package_type');
     }
 
     /**
@@ -158,7 +188,7 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
     {
         $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_height');
 
-        if($default) {
+        if ($default) {
             return $default;
         }
 
@@ -187,7 +217,7 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
     {
         $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_length');
 
-        if($default) {
+        if ($default) {
             return $default;
         }
 
@@ -216,7 +246,7 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
     {
         $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_width');
 
-        if($default) {
+        if ($default) {
             return $default;
         }
 
@@ -245,7 +275,7 @@ class Nethuns_Sameday_Model_Rate_Request extends Varien_Object
     {
         $default = Mage::getStoreConfig('carriers/nethuns_sameday/default_weight');
 
-        if($default) {
+        if ($default) {
             return $default;
         }
 

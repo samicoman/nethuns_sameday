@@ -1,7 +1,8 @@
 <?php
+
 class Nethuns_Sameday_Model_Observer
 {
-    public function controller_action_layout_render_before_adminhtml_sales_order_shipment_view(Varien_Event_Observer $observer)
+    public function controller_action_layout_render_before_adminhtml_sales_order_shipment_view()
     {
         $this->_showGenerateAwbButtonOnOrderView();
     }
@@ -23,25 +24,28 @@ class Nethuns_Sameday_Model_Observer
         /** @var Mage_Sales_Model_Order $order */
         $order = $observer->getEvent()->getOrder();
 
-        /** @var Mage_Sales_Model_Entity_Order_Invoice_Collection $orders */
-        $orders = Mage::getModel('sales/order_invoice')
+        /** @var Mage_Sales_Model_Entity_Order_Invoice_Collection $invoices */
+        $invoices = Mage::getModel('sales/order_invoice')
             ->getCollection()
             ->addAttributeToFilter('order_id', array('eq' => $order->getId()));
-        $orders->getSelect()->limit(1);
+        $invoice = $invoices->getFirstItem();
 
-        if ((int)$orders->count() !== 0) {
+        if (empty($invoice) || empty($invoice->getId())) {
             return $this;
         }
 
-        if (!in_array($order->getState(), [
-            Mage_Sales_Model_Order::STATE_NEW,
-            Mage_Sales_Model_Order::STATE_PENDING_PAYMENT,
-            Mage_Sales_Model_Order::STATE_PROCESSING ])) {
+        if (!in_array(
+            $order->getState(),
+            array(
+                Mage_Sales_Model_Order::STATE_NEW,
+                Mage_Sales_Model_Order::STATE_PENDING_PAYMENT,
+                Mage_Sales_Model_Order::STATE_PROCESSING
+            )
+        )) {
             return $this;
         }
 
         try {
-
             if (!$order->canInvoice()) {
                 $order->addStatusHistoryComment($helper->__('Order could not be invoiced automatically'), false);
                 $order->save();
@@ -74,10 +78,13 @@ class Nethuns_Sameday_Model_Observer
             $transactionSave->save();
 
             /** @var  Nethuns_Sameday_Model_Awb */
-            Mage::getModel('nethuns_sameday/awb', ['shipment_id' => $shipment->getId()]);
+            Mage::getModel('nethuns_sameday/awb', array('shipment_id' => $shipment->getId()));
 
         } catch (Exception $e) {
-            $order->addStatusHistoryComment($helper->__('Error while automatically processing the order: %s', $e->getMessage()), false);
+            $order->addStatusHistoryComment(
+                $helper->__('Error while automatically processing the order: %s', $e->getMessage()),
+                false
+            );
             $order->save();
         }
 
@@ -100,16 +107,28 @@ class Nethuns_Sameday_Model_Observer
 
         $trackings = $shipment->getAllTracks();
 
-        if(empty($trackings)) {
-            $block->addButton('generate_awb', array(
-                'label'     => $helper->__('Generate AWB'),
-                'onclick'   => 'setLocation(\'' . $block->getUrl('adminhtml/shipment_awb/generate', ['shipment_id' => $shipment->getId()]) . '\')',
-            ));
+        if (empty($trackings)) {
+            $block->addButton(
+            'generate_awb',
+                array(
+                    'label' => $helper->__('Generate AWB'),
+                    'onclick' => 'setLocation(\'' . $block->getUrl(
+                        'adminhtml/shipment_awb/generate',
+                        array('shipment_id' => $shipment->getId())
+                    ) . '\')',
+                )
+            );
         } else {
-            $block->addButton('download_awb', array(
-                'label'     => $helper->__('Download AWB'),
-                'onclick'   => 'setLocation(\'' . $block->getUrl('adminhtml/shipment_awb/download', ['tracking_id' => $trackings[0]->getNumber()]) . '\')',
-            ));
+            $block->addButton(
+                'download_awb',
+                array(
+                    'label' => $helper->__('Download AWB'),
+                    'onclick' => 'setLocation(\'' . $block->getUrl(
+                        'adminhtml/shipment_awb/download',
+                        array('tracking_id' => $trackings[0]->getNumber())
+                    ) . '\')',
+                )
+            );
         }
 
         return $this;

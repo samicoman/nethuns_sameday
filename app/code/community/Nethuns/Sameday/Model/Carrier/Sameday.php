@@ -106,7 +106,7 @@ class Nethuns_Sameday_Model_Carrier_Sameday
         /** @var Mage_Shipping_Model_Rate_Result $result */
         $this->_result = Mage::getModel('shipping/rate_result');
 
-        /** @var Nethuns_Sameday_Model_Rate_Request $this->_rawRequest */
+        /** @var Nethuns_Sameday_Model_Rate_Request $this ->_rawRequest */
         $this->_rawRequest = Mage::getModel('nethuns_sameday/rate_request');
 
         $this->_rawRequest->setService(self::NEXTDAY_DELIVERY);
@@ -132,16 +132,39 @@ class Nethuns_Sameday_Model_Carrier_Sameday
     {
         $this->_request = $request;
 
-        $shipping_origin = explode('___', Mage::getStoreConfig('carriers/nethuns_sameday/shipping_origin', $this->getStore()));
-        $this->_rawRequest->setPickupPoint($request->getPickupPoint() ? $request->getPickupPoint() : $shipping_origin[0]);
-        $this->_rawRequest->setContactPerson($request->getContactPerson() ? $request->getContactPerson() : $shipping_origin[1]);
-        $this->_rawRequest->setPackageType($request->getPackageType() ? $request->getPackageType() : Mage::getStoreConfig('carriers/nethuns_sameday/package_type', $this->getStore()));
-        /* TODO: figure out a way to calculate the package number based on product attributes or max package weight (see USPS) */
-        $this->_rawRequest->setPackageNumber($request->getPackageNumber() ? $request->getPackageNumber() : self::DEFAULT_PACKAGE_NUMBER);
-        $this->_rawRequest->setPackageWeight($request->getPackageWeight());
-        $this->_rawRequest->setAwbPayment($request->getAwbPayment() ? $request->getAwbPayment() : Mage::getStoreConfig('carriers/nethuns_sameday/awb_payment', $this->getStore()));
-        $this->_rawRequest->setCashOnDelivery($request->getBaseSubtotalInclTax() ? $request->getBaseSubtotalInclTax() : 0);
-        $this->_rawRequest->setInsuredValue($request->getPackageValue() ? $request->getPackageValue() : 0);
+        $shippingOrigin = explode(
+            '___',
+            Mage::getStoreConfig('carriers/nethuns_sameday/shipping_origin', $this->getStore())
+        );
+        $this->_rawRequest->setPickupPoint(
+            $request->getPickupPoint() ? $request->getPickupPoint() : $shippingOrigin[0]
+        );
+        $this->_rawRequest->setContactPerson(
+            $request->getContactPerson() ? $request->getContactPerson() : $shippingOrigin[1]
+        );
+        $this->_rawRequest->setPackageType(
+            $request->getPackageType() ?
+            $request->getPackageType() :
+            Mage::getStoreConfig('carriers/nethuns_sameday/package_type', $this->getStore())
+        );
+        /* TODO: figure out a way to calculate the package number based on product attributes or max package weight */
+        $this->_rawRequest->setPackageNumber(
+            $request->getPackageNumber() ? $request->getPackageNumber() : self::DEFAULT_PACKAGE_NUMBER
+        );
+        $this->_rawRequest->setPackageWeight(
+            $request->getPackageWeight()
+        );
+        $this->_rawRequest->setAwbPayment(
+            $request->getAwbPayment() ?
+            $request->getAwbPayment() :
+            Mage::getStoreConfig('carriers/nethuns_sameday/awb_payment', $this->getStore())
+        );
+        $this->_rawRequest->setCashOnDelivery(
+            $request->getBaseSubtotalInclTax() ? $request->getBaseSubtotalInclTax() : 0
+        );
+        $this->_rawRequest->setInsuredValue(
+            $request->getPackageValue() ? $request->getPackageValue() : 0
+        );
         $this->_rawRequest->setThirdPartyPickup(self::TPP_NO);
 
         $this->_rawRequest->setAwbRecipient($request);
@@ -162,12 +185,11 @@ class Nethuns_Sameday_Model_Carrier_Sameday
 
         $response = $api->request(
             'awb/estimate-cost',
-            Nethuns_Sameday_Model_Api::POST,
-            [],
+            Zend_Http_Client::POST,
+            array(),
             $this->_rawRequest->exportData()
         );
 
-        /* TODO: add setting to chose whether to see the error on the checkout or not */
         if (isset($response['code']) && $response['code'] != 200) {
             /** @var Mage_Shipping_Model_Rate_Result_Error $error */
             $error = Mage::getModel('shipping/rate_result_error');
@@ -176,15 +198,15 @@ class Nethuns_Sameday_Model_Carrier_Sameday
             $message = '';
 
             /* TODO: come up with a recursive solution */
-            foreach ($response['errors']['children'] as $fields_0) {
-                foreach ($fields_0 as $fields_1) {
-                    foreach ($fields_1 as $fields_2) {
-                        if (!is_array($fields_2)) {
-                            $message .= $fields_2 . ' ';
+            foreach ($response['errors']['children'] as $fields0) {
+                foreach ($fields0 as $fields1) {
+                    foreach ($fields1 as $fields2) {
+                        if (!is_array($fields2)) {
+                            $message .= $fields2 . ' ';
                         } else {
-                            foreach ($fields_2 as $fields_3) {
-                                foreach ($fields_3 as $fields_4) {
-                                    $message .= $fields_4 ? reset($fields_4) : '';
+                            foreach ($fields2 as $fields3) {
+                                foreach ($fields3 as $fields4) {
+                                    $message .= $fields4 ? reset($fields4) : '';
                                 }
                             }
                         }
@@ -217,7 +239,7 @@ class Nethuns_Sameday_Model_Carrier_Sameday
     {
         $freeShipping = false;
         /** @var Mage_Sales_Model_Quote_Item $item */
-        foreach($request->getAllItems() as $item) {
+        foreach ($request->getAllItems() as $item) {
             if ($item->getProduct() instanceof Mage_Catalog_Model_Product) {
                 if ($item->getFreeShipping()) {
                     $freeShipping = true;
@@ -226,6 +248,7 @@ class Nethuns_Sameday_Model_Carrier_Sameday
                 }
             }
         }
+
         if ($freeShipping) {
             $request->setFreeShipping(true);
         }
@@ -250,22 +273,22 @@ class Nethuns_Sameday_Model_Carrier_Sameday
     }
 
     /**
-     * @param $method_id
+     * @param $methodId
      * @param $key
      * @return string
      */
-    public function getMethod($method_id, $key)
+    public function getMethod($methodId, $key)
     {
-        $this->_methods = [
-            self::SAMEDAY_DELIVERY => [
-                'code'  =>  'sameday',
+        $this->_methods = array(
+            self::SAMEDAY_DELIVERY => array(
+                'code' => 'sameday',
                 'title' => Mage::helper('nethuns_sameday')->__('Same Day Delivery')
-            ],
-            self::NEXTDAY_DELIVERY => [
-                'code'  =>  'nextday',
+            ),
+            self::NEXTDAY_DELIVERY => array(
+                'code' => 'nextday',
                 'title' => Mage::helper('nethuns_sameday')->__('Next Day Delivery')
-            ]
-        ];
-        return $this->_methods[$method_id][$key];
+            )
+        );
+        return $this->_methods[$methodId][$key];
     }
 }
