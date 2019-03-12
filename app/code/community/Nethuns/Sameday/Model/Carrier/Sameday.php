@@ -33,13 +33,6 @@ class Nethuns_Sameday_Model_Carrier_Sameday
     const NEXTDAY_DELIVERY = 7;
 
     /**
-     * Method
-     *
-     * @var string
-     */
-    protected $_methods;
-
-    /**
      * AWB Payment
      */
     const CLIENT = 1;
@@ -223,8 +216,8 @@ class Nethuns_Sameday_Model_Carrier_Sameday
         $method = Mage::getModel('shipping/rate_result_method');
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($this->getConfigData('title'));
-        $method->setMethod($this->getMethod($this->_rawRequest->getService(), 'code'));
-        $method->setMethodTitle($this->getMethod($this->_rawRequest->getService(), 'title'));
+        $method->setMethod($this->getMethodById($this->_rawRequest->getService(), 'code'));
+        $method->setMethodTitle($this->getMethodById($this->_rawRequest->getService(), 'title'));
         $method->setPrice($response['amount']);
         $method->setCost($response['amount']);
 
@@ -275,11 +268,11 @@ class Nethuns_Sameday_Model_Carrier_Sameday
     /**
      * @param $methodId
      * @param $key
-     * @return string
+     * @return string|array
      */
-    public function getMethod($methodId, $key)
+    public static function getMethodById($methodId, $key)
     {
-        $this->_methods = array(
+        $methods = array(
             self::SAMEDAY_DELIVERY => array(
                 'code' => 'sameday',
                 'title' => Mage::helper('nethuns_sameday')->__('Same Day Delivery')
@@ -289,6 +282,28 @@ class Nethuns_Sameday_Model_Carrier_Sameday
                 'title' => Mage::helper('nethuns_sameday')->__('Next Day Delivery')
             )
         );
-        return $this->_methods[$methodId][$key];
+
+        return $methods[$methodId][$key];
+    }
+
+    /**
+     * @param $method
+     * @param $key
+     * @return string|array
+     */
+    public static function getMethodByCode($method, $key)
+    {
+        $methods = array(
+            'sameday' => array(
+                'id' => self::SAMEDAY_DELIVERY,
+                'title' => Mage::helper('nethuns_sameday')->__('Same Day Delivery')
+            ),
+            'nextday' => array(
+                'id' => self::NEXTDAY_DELIVERY,
+                'title' => Mage::helper('nethuns_sameday')->__('Next Day Delivery')
+            )
+        );
+
+        return $methods[$method][$key];
     }
 }

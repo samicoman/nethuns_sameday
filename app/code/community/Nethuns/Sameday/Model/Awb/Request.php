@@ -39,17 +39,17 @@ class Nethuns_Sameday_Model_Awb_Request extends Nethuns_Sameday_Model_Rate_Reque
             array('name' => $region->getName()));
         $data['county'] = $response['data'][0]['id'];
         $data['countyString'] = $response['data'][0]['name'];
+        $data['address'] = implode(',', $address->getStreet());
 
         $city = $address->getCity();
         $response = $api->request(
             'geolocation/city',
             Zend_Http_Client::GET,
             array(),
-            array('name' => $city, 'county' => $response['data'][0]['id']));
+            array('name' => $city, 'county' => $response['data'][0]['id'], 'address' => $data['address']));
         $data['city'] = $response['data'][0]['id'];
         $data['cityString'] = $response['data'][0]['name'];
 
-        $data['address'] = implode(',', $address->getStreet());
         $data['name'] = $address->getFirstname() . ' ' . $address->getLastname();
         $data['phoneNumber'] = $address->getTelephone();
         $data['email'] = $address->getEmail();
@@ -74,6 +74,18 @@ class Nethuns_Sameday_Model_Awb_Request extends Nethuns_Sameday_Model_Rate_Reque
         $data[] = $parcel;
 
         $this->setData('parcels', $data);
+    }
+
+    /**
+     * @param string $method
+     * @return Nethuns_Sameday_Model_Rate_Request|void
+     */
+    public function setService($method)
+    {
+        $service = str_replace(Nethuns_Sameday_Model_Carrier_Sameday::CODE . "_", "", $method);
+        $service = Nethuns_Sameday_Model_Carrier_Sameday::getMethodByCode($service, 'id');
+
+        $this->setData('service', $service);
     }
 
     /**

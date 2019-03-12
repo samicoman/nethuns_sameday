@@ -27,7 +27,7 @@ class Nethuns_Sameday_Model_Awb extends Varien_Object
         $order = $this->_shipment->getOrder();
 
         $this->_request = Mage::getModel('nethuns_sameday/awb_request');
-        $this->_request->setService(Nethuns_Sameday_Model_Carrier_Sameday::NEXTDAY_DELIVERY);
+        $this->_request->setService($order->getShippingMethod());
 
         $shippingOrigin = explode(
             '___',

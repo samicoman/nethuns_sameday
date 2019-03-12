@@ -30,7 +30,7 @@ class Nethuns_Sameday_Model_Observer
             ->addAttributeToFilter('order_id', array('eq' => $order->getId()));
         $invoice = $invoices->getFirstItem();
 
-        if (empty($invoice) || empty($invoice->getId())) {
+        if ($invoice && $invoice->getId()) {
             return $this;
         }
 
@@ -50,21 +50,22 @@ class Nethuns_Sameday_Model_Observer
                 $order->addStatusHistoryComment($helper->__('Order could not be invoiced automatically'), false);
                 $order->save();
                 return $this;
-            } else {
-                /** @var Mage_Sales_Model_Order_Invoice $invoice */
-                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
-                $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
-                $invoice->register();
-
-                $order->setCustomerNoteNotify(false);
-                $order->setIsInProcess(true);
-                $order->addStatusHistoryComment($helper->__('Order invoiced automatically'), false);
-
-                $transactionSave = Mage::getModel('core/resource_transaction')
-                    ->addObject($invoice)
-                    ->addObject($invoice->getOrder());
-                $transactionSave->save();
             }
+
+            /** @var Mage_Sales_Model_Order_Invoice $invoice */
+            $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+            $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
+            $invoice->register();
+
+            $order->setCustomerNoteNotify(false);
+            $order->setIsInProcess(true);
+            $order->addStatusHistoryComment($helper->__('Order invoiced automatically'), false);
+
+            /** @var Mage_Core_Model_Resource_Transaction $transactionSave */
+            $transactionSave = Mage::getModel('core/resource_transaction')
+                ->addObject($invoice)
+                ->addObject($invoice->getOrder());
+            $transactionSave->save();
 
             $shipment = $order->prepareShipment();
             $shipment->register();
@@ -72,6 +73,7 @@ class Nethuns_Sameday_Model_Observer
             $order->setIsInProcess(true);
             $order->addStatusHistoryComment($helper->__('Order shipped automatically'), false);
 
+            /** @var Mage_Core_Model_Resource_Transaction $transactionSave */
             $transactionSave = Mage::getModel('core/resource_transaction')
                 ->addObject($shipment)
                 ->addObject($shipment->getOrder());
