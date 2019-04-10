@@ -24,16 +24,6 @@ class Nethuns_Sameday_Model_Observer
         /** @var Mage_Sales_Model_Order $order */
         $order = $observer->getEvent()->getOrder();
 
-        /** @var Mage_Sales_Model_Entity_Order_Invoice_Collection $invoices */
-        $invoices = Mage::getModel('sales/order_invoice')
-            ->getCollection()
-            ->addAttributeToFilter('order_id', array('eq' => $order->getId()));
-        $invoice = $invoices->getFirstItem();
-
-        if ($invoice && $invoice->getId()) {
-            return $this;
-        }
-
         if (!in_array(
             $order->getState(),
             array(
@@ -46,27 +36,6 @@ class Nethuns_Sameday_Model_Observer
         }
 
         try {
-            if (!$order->canInvoice()) {
-                $order->addStatusHistoryComment($helper->__('Order could not be invoiced automatically'), false);
-                $order->save();
-                return $this;
-            }
-
-            /** @var Mage_Sales_Model_Order_Invoice $invoice */
-            $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
-            $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
-            $invoice->register();
-
-            $order->setCustomerNoteNotify(false);
-            $order->setIsInProcess(true);
-            $order->addStatusHistoryComment($helper->__('Order invoiced automatically'), false);
-
-            /** @var Mage_Core_Model_Resource_Transaction $transactionSave */
-            $transactionSave = Mage::getModel('core/resource_transaction')
-                ->addObject($invoice)
-                ->addObject($invoice->getOrder());
-            $transactionSave->save();
-
             $shipment = $order->prepareShipment();
             $shipment->register();
 
@@ -87,7 +56,6 @@ class Nethuns_Sameday_Model_Observer
                 $helper->__('Error while automatically processing the order: %s', $e->getMessage()),
                 false
             );
-            $order->save();
         }
 
         return $this;
@@ -136,3 +104,4 @@ class Nethuns_Sameday_Model_Observer
         return $this;
     }
 }
+
